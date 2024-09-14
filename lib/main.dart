@@ -1,0 +1,349 @@
+import 'dart:math';
+
+import 'package:country_flags/country_flags.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_earth_globe/flutter_earth_globe.dart';
+import 'package:flutter_earth_globe/flutter_earth_globe_controller.dart';
+import 'package:flutter_earth_globe/globe_coordinates.dart';
+import 'package:flutter_earth_globe/point.dart';
+import 'package:guess_the_flag/country_codes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: "Guess The Flag!",
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+
+
+enum MapState {
+  ON,
+  WRONG_ANSWER,
+  OFF
+}
+
+
+
+class _MyHomePageState extends State<MyHomePage> {
+  final random = Random();
+
+  late Country country;
+  List<Country> options = List<Country>.filled(4, ("", "", "", 0, .0, .0));
+  int key = 0;
+  MapState? map_state;
+
+  double turns = 0;
+
+  bool showing_globe = false;
+
+
+  int score = 0;
+  int? high;
+  final prefs = SharedPreferencesWithCache.create(
+    cacheOptions: const SharedPreferencesWithCacheOptions(
+      allowList: {"high", "map_state"}
+    ),
+  );
+
+
+  Future<void> initPrefs() async {
+    final SharedPreferencesWithCache preferences = await prefs;
+    if(!preferences.containsKey("high")) preferences.setInt("high", 0);
+    if(!preferences.containsKey("map_state")) preferences.setInt("map_state", MapState.WRONG_ANSWER.index);
+
+    setState(() {
+      high = preferences.getInt("high");
+      map_state = MapState.values[preferences.getInt("map_state") ?? 1];
+    });
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    initPrefs();
+
+    country = COUNTRIES[random.nextInt(COUNTRIES.length)];
+    generateAnswers();
+
+  }
+
+
+  // generates answers for current chosen country
+  void generateAnswers(){
+    for(int i = 0; i < 4; ++i){ // Possibly add more options in the future?
+      Country new_option = country;
+
+      if (i != 0)
+        do new_option = COUNTRIES[random.nextInt(COUNTRIES.length)];
+        while(options.contains(new_option)); // ensuring not to show the same answer again
+
+      options[i] = new_option;
+    }
+
+    options.shuffle(); // so that the correct answer is not always at the same position
+  }
+
+
+  void updateFlag(){
+    Country new_code = COUNTRIES[random.nextInt(COUNTRIES.length)];
+    while (new_code == country) // ensuring not to show the same flag again
+      new_code = COUNTRIES[random.nextInt(COUNTRIES.length)];
+
+    country = new_code;
+      generateAnswers();
+
+    setState(() => key = 1 - key); // switching key to force the AnimatedSwitcher to rebuild
+  }
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
+    return Scaffold(
+      body: Center(
+        child: Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 32),
+                        child: IconButton(
+                          icon: Icon(
+                            map_state == MapState.ON ? Icons.map_sharp :
+                            map_state == MapState.WRONG_ANSWER ? Icons.thumb_down_off_alt_rounded :
+                            Icons.cancel_outlined,
+                          ),
+                          iconSize: 46,
+                          onPressed: () async {
+                            setState(() {
+                              map_state =
+                                map_state == MapState.ON ? MapState.WRONG_ANSWER  :
+                                map_state == MapState.WRONG_ANSWER ? MapState.OFF :
+                                MapState.ON;
+                            });
+            
+                            final SharedPreferencesWithCache preferences = await prefs;
+                            preferences.setInt("map_state", map_state!.index);
+                          },
+                        ),
+                      ),
+                    ),
+            
+                    Align(
+                      alignment: Alignment.center,
+                      child: AnimatedRotation(
+                        duration: const Duration(milliseconds: 500),
+                        turns: turns,
+                        curve: Curves.fastEaseInToSlowEaseOut,
+                        child: Text(
+                          "$score/${high ?? '~'}",
+                          style: const TextStyle(fontSize: 38),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+            
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: CountryFlag.fromCountryCode(
+                    key: ValueKey(key),
+                    country.$2,
+                    width: size.width / 2.4 * 1.8,
+                    height:size.width / 2.4 * 1.35,
+                    shape: const RoundedRectangle(24),
+                  ),
+                ),
+
+                const SizedBox(height: 0),
+
+                OptionsWidget(
+                  options: options,
+                  correct: options.indexOf(country),
+                  on_correct: () async {
+                    showing_globe = true;
+
+                    final SharedPreferencesWithCache preferences = await prefs;
+                    setState(() {
+                      score++;
+                      preferences.setInt("high", high = max(score, high ?? 0));
+
+                    });
+                  },
+                  on_wrong: () => setState((){
+                    showing_globe = true;
+
+                    score = 0;
+                    turns = 1 - turns;
+                  }),
+                  callback: (){
+                    showing_globe = false;
+                    updateFlag();
+                  },
+                  map_state: map_state ?? MapState.WRONG_ANSWER,
+                ),
+              ],
+            ),
+
+
+
+            if(showing_globe) Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Colors.transparent,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
+class OptionsWidget extends StatefulWidget {
+  const OptionsWidget({
+    super.key,
+    required this.options,
+    required this.correct,
+    required this.map_state,
+    required this.on_correct,
+    required this.on_wrong,
+    required this.callback,
+  });
+
+  final List<Country> options;
+  final int correct;
+  final MapState map_state;
+  final Future<void> Function() on_correct;
+  final void Function() on_wrong;
+  final void Function() callback;
+
+  @override
+  State<OptionsWidget> createState() => _OptionsWidgetState();
+}
+
+class _OptionsWidgetState extends State<OptionsWidget> {
+
+  late List<Color> colors = List.filled(widget.options.length, Colors.white);
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
+    return Column(
+      children: [
+        for(int i = 0; i < widget.options.length; ++i)
+          Padding(
+            // padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+            padding: const EdgeInsets.only(right: 24, left: 24, bottom: 6),
+            child: TextButton(
+              style: OutlinedButton.styleFrom(backgroundColor: colors[i]),
+              child: SizedBox(
+                width: size.width * .7,
+                child: Text(
+                  widget.options[i].$1, //* Country name
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 20, color: Colors.black),
+                ),
+              ),
+              onPressed: () async {
+                setState(() {
+                  colors[i] = Colors.red;
+                  colors[widget.correct] = Colors.green;
+                });
+
+                i == widget.correct ? widget.on_correct() : widget.on_wrong();
+
+
+                await Future.delayed(const Duration(milliseconds: 1250));
+                colors[i] = colors[widget.correct] = Colors.white;
+
+                switch(widget.map_state){
+                  case MapState.WRONG_ANSWER when i != widget.correct:
+                  case MapState.ON:
+                    if(context.mounted) await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => Globe(point: Point(
+                          id: "1",
+                          label: widget.options[widget.correct].$1,
+                          isLabelVisible: true,
+                          coordinates: GlobeCoordinates(widget.options[widget.correct].$5, widget.options[widget.correct].$6),
+                          style: const PointStyle(size: 6, color: Colors.white),
+                        ),),
+                      )
+                    );
+                    await Future.delayed(const Duration(milliseconds: 500)); // slight delay after closing the map
+                  default:
+                }
+
+                widget.callback();
+              },
+            ),
+          )
+      ],
+    );
+  }
+}
+
+
+
+class Globe extends StatelessWidget {
+  const Globe({super.key, required this.point});
+  final Point point;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = FlutterEarthGlobeController(
+      rotationSpeed: .05,
+      isBackgroundFollowingSphereRotation: true,
+      surface: Image.asset("assets/2k_earth_day.jpg").image,
+      background: Image.asset("assets/2k_stars.jpg").image,
+    );
+    
+    controller.addPoint(point);
+
+    return Scaffold(
+      body: FlutterEarthGlobe(
+        radius: 140,
+        controller: controller,
+      ),
+    );
+  }
+}
+
+
