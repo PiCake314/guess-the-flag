@@ -789,15 +789,6 @@ const Country Botswana = (
 24
 );
 
-const Country Bouvet_Island = (
-  "Bouvet Island",
-  "BV",
-  "BVT",
-  74,
-  -54.4333,
-  3.4
-);
-
 const Country Brazil = (
   "Brazil",
   "BR",
@@ -1203,15 +1194,6 @@ const Country France = (
   2
 );
 
-const Country French_Guiana = (
-  "French Guiana",
-  "GF",
-  "GUF",
-  254,
-  4,
-  -53
-);
-
 const Country French_Polynesia = (
   "French Polynesia",
   "PF",
@@ -1311,15 +1293,6 @@ const Country Grenada = (
   -61.6667
 );
 
-const Country Guadeloupe = (
-  "Guadeloupe",
-  "GP",
-  "GLP",
-  312,
-  16.25,
-  -61.5833
-);
-
 const Country Guam = (
   "Guam",
   "GU",
@@ -1381,15 +1354,6 @@ const Country Haiti = (
   332,
   19,
   -72.4167
-);
-
-const Country Heard_Island_and_McDonald_Islands = (
-  "Heard Island and McDonald Islands",
-  "HM",
-  "HMD",
-  334,
-  -53.1,
-  72.5167
 );
 
 const Country Holy_See_Vatican_City_State = (
@@ -1770,15 +1734,6 @@ const Country Marshall_Islands = (
   168
 );
 
-const Country Martinique = (
-  "Martinique",
-  "MQ",
-  "MTQ",
-  474,
-  14.6667,
-  -61
-);
-
 const Country Mauritania = (
   "Mauritania",
   "MR",
@@ -1795,15 +1750,6 @@ const Country Mauritius = (
   480,
   -20.2833,
   57.55
-);
-
-const Country Mayotte = (
-  "Mayotte",
-  "YT",
-  "MYT",
-  175,
-  -12.8333,
-  45.1667
 );
 
 const Country Mexico = (
@@ -1831,15 +1777,6 @@ const Country Moldova = (
   498,
   47,
   29
-);
-
-const Country Monaco = (
-  "Monaco",
-  "MC",
-  "MCO",
-  492,
-  43.7333,
-  7.4
 );
 
 const Country Mongolia = (
@@ -2139,14 +2076,6 @@ const Country Qatar = (
   51.25
 );
 
-const Country Reunion = (
-  "Réunion",
-  "RE",
-  "REU",
-  638,
-  -21.1,
-  55.6
-);
 
 const Country Romania = (
   "Romania",
@@ -2398,15 +2327,6 @@ const Country Suriname = (
   740,
   4,
   -56
-);
-
-const Country Svalbard_and_Jan_Mayen = (
-  "Svalbard and Jan Mayen",
-  "SJ",
-  "SJM",
-  744,
-  78,
-  20
 );
 
 const Country Swaziland = (
@@ -2785,7 +2705,6 @@ const List<Country> COUNTRIES = [
   Caribbean_Netherlands,
   Bosnia_and_Herzegovina,
   Botswana,
-  Bouvet_Island,
   Brazil,
   British_Indian_Ocean_Territory,
   Brunei,
@@ -2831,7 +2750,6 @@ const List<Country> COUNTRIES = [
   Fiji,
   Finland,
   France,
-  French_Guiana,
   French_Polynesia,
   French_Southern_Territories,
   Gabon,
@@ -2843,7 +2761,6 @@ const List<Country> COUNTRIES = [
   Greece,
   Greenland,
   Grenada,
-  Guadeloupe,
   Guam,
   Guatemala,
   Guernsey,
@@ -2851,7 +2768,6 @@ const List<Country> COUNTRIES = [
   Guinea,
   Guyana,
   Haiti,
-  Heard_Island_and_McDonald_Islands,
   Holy_See_Vatican_City_State,
   Honduras,
   Hong_Kong,
@@ -2894,14 +2810,11 @@ const List<Country> COUNTRIES = [
   Mali,
   Malta,
   Marshall_Islands,
-  Martinique,
   Mauritania,
   Mauritius,
-  Mayotte,
   Mexico,
   Micronesia,
   Moldova,
-  Monaco,
   Mongolia,
   Montenegro,
   Montserrat,
@@ -2935,7 +2848,6 @@ const List<Country> COUNTRIES = [
   Portugal,
   Puerto_Rico,
   Qatar,
-  Reunion,
   Romania,
   Russia,
   Rwanda,
@@ -2964,7 +2876,6 @@ const List<Country> COUNTRIES = [
   Sri_Lanka,
   Sudan,
   Suriname,
-  Svalbard_and_Jan_Mayen,
   Swaziland,
   Sweden,
   Switzerland,

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_earth_globe/flutter_earth_globe.dart';
 import 'package:flutter_earth_globe/flutter_earth_globe_controller.dart';
 import 'package:flutter_earth_globe/globe_coordinates.dart';
@@ -20,6 +21,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
     return MaterialApp(
       title: "Guess The Flag!",
       theme: ThemeData(
@@ -161,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                     ),
-            
+
                     Align(
                       alignment: Alignment.center,
                       child: AnimatedRotation(
@@ -176,12 +179,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                   ],
                 ),
-            
+
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 250),
                   child: CountryFlag.fromCountryCode(
                     key: ValueKey(key),
-                    country.$2,
+                    country.$2, // Country code
                     width: size.width / 2.4 * 1.8,
                     height:size.width / 2.4 * 1.35,
                     shape: const RoundedRectangle(24),

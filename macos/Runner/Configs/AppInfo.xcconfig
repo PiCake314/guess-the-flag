@@ -8,7 +8,7 @@
 PRODUCT_NAME = guess_the_flag
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.AliAlmutawaJr.guessTheFlag
+PRODUCT_BUNDLE_IDENTIFIER = com.AliAlmutawa.guessTheFlag
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2024 com.AliAlmutawaJr. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2024 com.AliAlmutawa. All rights reserved.
