@@ -39,6 +39,7 @@ dependencies:
   flutter_earth_globe:
   flutter_launcher_icons: ^0.13.1
   shared_preferences: ^2.3.2
+  confetti: ^0.8.0
   
 
 flutter_launcher_icons:
@@ -72,6 +73,7 @@ flutter:
   assets:
     - assets/2k_earth_day.jpg
     - assets/2k_stars.jpg
+    - assets/bg/BG.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
