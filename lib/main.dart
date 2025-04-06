@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: "Guess The Flag!",
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -69,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool prevent_touch = false;
 
-  List<Country> country_list = COUNTRIES.getRange(0, 5).toList();
+  List<Country> country_list = [...COUNTRIES]; // make a copy
 
 
   int score = 0;
@@ -165,8 +166,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           padding: const EdgeInsets.only(left: 32),
                           child: IconButton(
                             icon: Icon(
-                              map_state == MapState.ON ? Icons.map_sharp :
-                              map_state == MapState.WRONG_ANSWER ? Icons.thumb_down_off_alt_rounded :
+                              map_state == MapState.ON ? Icons.public_outlined :
+                              map_state == MapState.WRONG_ANSWER ? Icons.error_outline_outlined :
                               Icons.cancel_outlined,
                               color: const Color(0xADB6C4FF),
                             ),
@@ -197,8 +198,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
 
                   AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
+                    duration: const Duration(milliseconds: 100),
                     child: Container(
+                      key: ValueKey(key),
                       decoration: const BoxDecoration(
                         boxShadow: [
                           BoxShadow(
@@ -209,7 +211,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                       ),
                       child: CountryFlag.fromCountryCode(
-                        key: ValueKey(key),
                         country.$2, // Country code
                         width: size.width / 2.4 * 1.8,
                         height:size.width / 2.4 * 1.35,
@@ -370,9 +371,22 @@ class Globe extends StatelessWidget {
     controller.addPoint(point);
 
     return Scaffold(
-      body: FlutterEarthGlobe(
-        radius: 140,
-        controller: controller,
+      body: Stack(
+        children: [
+          FlutterEarthGlobe(
+            radius: 140,
+            controller: controller,
+          ),
+          const Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: EdgeInsets.only(top: 48, left: 12),
+              child: BackButton(
+                color: Colors.white,
+              ),
+            ),
+          )
+        ],
       ),
     );
   }

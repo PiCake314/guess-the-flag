@@ -961,7 +961,7 @@ const Country Comoros = (
 );
 
 const Country Democratic_Republic_of_Congo = (
-  "Democratic Republic of the Congo",
+  "Dem. Rep. of the Congo",
   "CD",
   "COD",
   180,
@@ -1150,7 +1150,7 @@ const Country Ethiopia = (
 );
 
 const Country Falkland_Islands_Malvinas = (
-  "Falkland Islands (Malvinas)",
+  "Falkland Islands",
   "FK",
   "FLK",
   238,
@@ -1357,7 +1357,7 @@ const Country Haiti = (
 );
 
 const Country Holy_See_Vatican_City_State = (
-  "Holy See (Vatican City State)",
+  "Vatican City State",
   "VA",
   "VAT",
   336,
@@ -2132,7 +2132,7 @@ const Country Saint_Lucia = (
 );
 
 const Country Saint_Vincent_and_the_Grenadines = (
-  "Saint Vincent & the Grenadines",
+  "Saint Vincent",
   "VC",
   "VCT",
   670,
@@ -2222,7 +2222,7 @@ const Country Singapore = (
 );
 
 const Country Sint_Maarten_Dutch_part = (
-  "Sint Maarten (Dutch part)",
+  "Sint Maarten",
   "SX",
   "SXM",
   534,
@@ -2330,7 +2330,7 @@ const Country Suriname = (
 );
 
 const Country Swaziland = (
-  "Swaziland",
+  "Eswatini",
   "SZ",
   "SWZ",
   748,
@@ -2676,7 +2676,7 @@ const Country Zimbabwe = (
 
 const List<Country> COUNTRIES = [
   Afghanistan,
-  Aland_Islands,
+  // Aland_Islands,
   Albania,
   Algeria,
   American_Samoa,
@@ -2702,11 +2702,11 @@ const List<Country> COUNTRIES = [
   Bermuda,
   Bhutan,
   Bolivia,
-  Caribbean_Netherlands,
+  // Caribbean_Netherlands,
   Bosnia_and_Herzegovina,
   Botswana,
   Brazil,
-  British_Indian_Ocean_Territory,
+  // British_Indian_Ocean_Territory,
   Brunei,
   Bulgaria,
   Burkina_Faso,
@@ -2721,7 +2721,7 @@ const List<Country> COUNTRIES = [
   Chile,
   China,
   Christmas_Island,
-  Cocos_Keeling_Islands,
+  // Cocos_Keeling_Islands,
   Colombia,
   Comoros,
   Democratic_Republic_of_Congo,
@@ -2746,12 +2746,12 @@ const List<Country> COUNTRIES = [
   Estonia,
   Ethiopia,
   Falkland_Islands_Malvinas,
-  Faroe_Islands,
+  // Faroe_Islands,
   Fiji,
   Finland,
   France,
-  French_Polynesia,
-  French_Southern_Territories,
+  // French_Polynesia,
+  // French_Southern_Territories,
   Gabon,
   Gambia,
   Georgia,
@@ -2864,7 +2864,7 @@ const List<Country> COUNTRIES = [
   Seychelles,
   Sierra_Leone,
   Singapore,
-  Sint_Maarten_Dutch_part,
+  // Sint_Maarten_Dutch_part,
   Slovakia,
   Slovenia,
   Solomon_Islands,
@@ -2910,7 +2910,7 @@ const List<Country> COUNTRIES = [
   Vietnam,
   Virgin_Islands_British,
   Virgin_Islands_US,
-  Western_Sahara,
+  // Western_Sahara,
   Yemen,
   Zambia,
   Zimbabwe,
