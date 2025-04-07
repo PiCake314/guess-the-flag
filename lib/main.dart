@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:confetti/confetti.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_earth_globe/flutter_earth_globe.dart';
 import 'package:flutter_earth_globe/flutter_earth_globe_controller.dart';
 import 'package:flutter_earth_globe/globe_coordinates.dart';
 import 'package:flutter_earth_globe/point.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:guess_the_flag/country_codes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -72,12 +74,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Country> country_list = [...COUNTRIES]; // make a copy
 
-
   int score = 0;
-  int? high;
+  // int? high;
   final prefs = SharedPreferencesWithCache.create(
     cacheOptions: const SharedPreferencesWithCacheOptions(
-      allowList: {"high", "map_state"}
+      allowList: { /*"high",*/ "map_state"}
     ),
   );
 
@@ -100,19 +101,39 @@ class _MyHomePageState extends State<MyHomePage> {
     initPrefs();
 
     country_list.shuffle();
-    country = country_list[random.nextInt(country_list.length)];
+    country = country_list[0]; // start with the first one in the shuffled list
+    // country = country_list[random.nextInt(country_list.length)];
     generateAnswers();
 
+  }
+
+  final ConfettiController confetti = ConfettiController(duration: const Duration(seconds: 6));
+
+  @override
+  void dispose() {
+    confetti.dispose();
+    super.dispose();
+  }
+
+
+  bool winning = false;
+  Future<void> win() async {
+    setState(() => winning = true);
+    confetti.play();
+    await Future.delayed(confetti.duration + const Duration(seconds: 2)); // wait for confetti to finish
+    confetti.stop();
+    setState(() => winning = false);
   }
 
 
   // generates answers for current chosen country
   void generateAnswers(){
-    for(int i = 0; i < 4; ++i){ // Possibly add more options in the future?
-      Country new_option = country;
+    options[0] = country;
+    for(int i = 1; i < options.length; ++i){ // Possibly add more options in the future?
 
-      if (i != 0)
-        do new_option = COUNTRIES[random.nextInt(COUNTRIES.length)]; while(options.contains(new_option)); // ensuring not to show the same answer again
+      Country new_option;
+      // ensuring not to show the same answer again
+      do new_option = COUNTRIES[random.nextInt(COUNTRIES.length)]; while(options.contains(new_option));
 
       options[i] = new_option;
     }
@@ -120,145 +141,173 @@ class _MyHomePageState extends State<MyHomePage> {
     options.shuffle(); // so that the correct answer is not always at the same position
   }
 
-
   int index = 0;
-  void updateFlag(){
+  void updateFlag() {
     // Country new_code = COUNTRIES[random.nextInt(COUNTRIES.length)];
     // while (new_code == country) // ensuring not to show the same flag again
     //   new_code = COUNTRIES[random.nextInt(COUNTRIES.length)];
 
-    if(++index >= country_list.length){
-      country_list.shuffle();
-      index = 0;
-    }
-
     country = country_list[index];
     generateAnswers();
-
-    setState(() => key = 1 - key); // switching key to force the AnimatedSwitcher to rebuild
+    key = 1 - key;
+    // setState(() => key = 1 - key); // switching key to force the AnimatedSwitcher to rebuild
   }
 
 
+  void reset() {
+    country_list.shuffle();
+    score = 0;
+    turns = 1 - turns; // which way the score turns when reseting
+    index = 0;
+  }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      // backgroundColor: const Color(0x614A88FF),
-      backgroundColor: Colors.transparent,
-      body: Container(
-        decoration: const BoxDecoration(image: DecorationImage(
-          image: AssetImage("assets/bg/BG.png"),
-          fit: BoxFit.cover
-        )),
-        child: Center(
-          child: Stack(
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        Scaffold(
+          // backgroundColor: const Color(0x614A88FF),
+          backgroundColor: Colors.transparent,
+          body: Container(
+            decoration: const BoxDecoration(image: DecorationImage(
+              image: AssetImage("assets/bg/BG.png"),
+              fit: BoxFit.cover
+            )),
+            child: Center(
+              child: Stack(
                 children: [
-                  Stack(
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 32),
-                          child: IconButton(
-                            icon: Icon(
-                              map_state == MapState.ON ? Icons.public_outlined :
-                              map_state == MapState.WRONG_ANSWER ? Icons.error_outline_outlined :
-                              Icons.cancel_outlined,
-                              color: const Color(0xADB6C4FF),
-                            ),
-                            iconSize: 46,
-                            onPressed: () async {
-                              setState(() => ++map_state );
+                      Stack(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 32),
+                              child: IconButton(
+                                icon: Icon(
+                                  map_state == MapState.ON ? Icons.public_outlined :
+                                  map_state == MapState.WRONG_ANSWER ? Icons.error_outline_outlined :
+                                  Icons.cancel_outlined,
+                                  color: const Color(0xADB6C4FF),
+                                ),
+                                iconSize: 46,
+                                onPressed: () async {
+                                  setState(() => ++map_state );
 
-                              final SharedPreferencesWithCache preferences = await prefs;
-                              preferences.setInt("map_state", map_state.index);
-                            },
+                                  final SharedPreferencesWithCache preferences = await prefs;
+                                  preferences.setInt("map_state", map_state.index);
+                                },
+                              ),
+                            ),
+                          ),
+
+                          Align(
+                            alignment: Alignment.center,
+                            child: AnimatedRotation(
+                              duration: const Duration(milliseconds: 500),
+                              turns: turns,
+                              curve: Curves.fastEaseInToSlowEaseOut,
+                              child: Text(
+                                "$score/${country_list.length}",
+                                style: const TextStyle(fontSize: 38, color: Color(0xADB6C4FF)),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        child: Container(
+                          key: ValueKey(key),
+                          decoration: const BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black54,
+                                blurRadius: 24,
+                                offset: Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: CountryFlag.fromCountryCode(
+                            country.$2, // Country code
+                            width: size.width / 2.4 * 1.8,
+                            height:size.width / 2.4 * 1.35,
+                            shape: const RoundedRectangle(24),
                           ),
                         ),
                       ),
 
-                      Align(
-                        alignment: Alignment.center,
-                        child: AnimatedRotation(
-                          duration: const Duration(milliseconds: 500),
-                          turns: turns,
-                          curve: Curves.fastEaseInToSlowEaseOut,
-                          child: Text(
-                            "$score/${country_list.length}",
-                            style: const TextStyle(fontSize: 38, color: Color(0xADB6C4FF)),
-                          ),
-                        ),
-                      )
+                      const SizedBox(height: 0),
+
+                      OptionsWidget(
+                        options: options,
+                        correct: options.indexOf(country),
+                        preventTouch: () => setState(() => prevent_touch = true),
+                        almost_won: score >= country_list.length -1, // will never be greater but better safe than sorry
+                        onWin: () async {
+                          await win();
+                          reset();
+                        },
+
+                        onCorrect: () => setState(() => (score++, ++index)),
+
+                        onWrong: () => setState( reset ),
+
+                        callback: () {
+                          setState( () {
+                            prevent_touch = false;
+                            updateFlag();
+                          });
+                          // updateFlag();
+                        },
+                        map_state: map_state,
+                      ),
                     ],
                   ),
 
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 100),
-                    child: Container(
-                      key: ValueKey(key),
-                      decoration: const BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black54,
-                            blurRadius: 24,
-                            offset: Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: CountryFlag.fromCountryCode(
-                        country.$2, // Country code
-                        width: size.width / 2.4 * 1.8,
-                        height:size.width / 2.4 * 1.35,
-                        shape: const RoundedRectangle(24),
-                      ),
-                    ),
-                  ),
 
-                  const SizedBox(height: 0),
 
-                  OptionsWidget(
-                    options: options,
-                    correct: options.indexOf(country),
-                    on_correct: () async {
-                      prevent_touch = true;
-
-                      // final SharedPreferencesWithCache preferences = await prefs;
-                      setState(() {
-                        score++;
-                        // preferences.setInt("high", high = max(score, high ?? 0));
-                      });
-                    },
-                    on_wrong: () => setState((){
-                      prevent_touch = true;
-
-                      score = 0;
-                      turns = 1 - turns; // which way the score turns when reseting
-                    }),
-                    callback: (){
-                      prevent_touch = false;
-                      updateFlag();
-                    },
-                    map_state: map_state,
-                  ),
+                  if(prevent_touch) Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.transparent,
+                  )
                 ],
               ),
-
-
-
-              if(prevent_touch) Container(
-                width: double.infinity,
-                height: double.infinity,
-                color: Colors.transparent,
-              )
-            ],
+            ),
           ),
         ),
-      ),
+
+        // if(winning)
+        AnimatedOpacity(
+          duration: const Duration(milliseconds: 500),
+          opacity: winning ? 1.0 : 0.0,
+          child: Align(
+            alignment: Alignment.center,
+            child: Text("You Won!",
+              style: TextStyle(
+                fontFamily: GoogleFonts.playfairDisplay().fontFamily,
+                color: Colors.blue.shade200,
+                decoration: TextDecoration.none,
+                fontSize: 64,
+              ),
+            ),
+          ),
+        ),
+
+        ConfettiWidget(
+          confettiController: confetti,
+          blastDirection: pi / 2,
+          emissionFrequency: .35,
+          blastDirectionality: BlastDirectionality.explosive,
+        ),
+      ],
     );
   }
 }
@@ -272,16 +321,22 @@ class OptionsWidget extends StatefulWidget {
     required this.options,
     required this.correct,
     required this.map_state,
-    required this.on_correct,
-    required this.on_wrong,
+    required this.preventTouch,
+    required this.almost_won,
+    required this.onWin,
+    required this.onCorrect,
+    required this.onWrong,
     required this.callback,
   });
 
   final List<Country> options;
   final int correct;
   final MapState map_state;
-  final Future<void> Function() on_correct;
-  final void Function() on_wrong;
+  final void Function() preventTouch;
+  final bool almost_won;
+  final Future<void> Function() onWin;
+  final void Function() onCorrect;
+  final void Function() onWrong;
   final void Function() callback;
 
   @override
@@ -320,10 +375,15 @@ class _OptionsWidgetState extends State<OptionsWidget> {
                   colors[widget.correct] = Colors.green;
                 });
 
-                i == widget.correct ? widget.on_correct() : widget.on_wrong();
-
-
+                widget.preventTouch();
                 await Future.delayed(const Duration(milliseconds: 1250));
+
+                i == widget.correct? widget.onCorrect() : widget.onWrong();
+
+                final bool did_win = widget.almost_won && i == widget.correct;
+                if(did_win) await widget.onWin();
+
+
                 colors[i] = colors[widget.correct] = BUTTON_COLOR;
 
                 switch(widget.map_state){
@@ -337,7 +397,7 @@ class _OptionsWidgetState extends State<OptionsWidget> {
                           isLabelVisible: true,
                           coordinates: GlobeCoordinates(widget.options[widget.correct].$5, widget.options[widget.correct].$6),
                           style: const PointStyle(size: 6, color: Colors.white),
-                        ),),
+                        )),
                       )
                     );
                     await Future.delayed(const Duration(milliseconds: 500)); // slight delay after closing the map
