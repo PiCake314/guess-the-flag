@@ -120,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> win() async {
     setState(() => winning = true);
     confetti.play();
-    await Future.delayed(confetti.duration + const Duration(seconds: 2)); // wait for confetti to finish
+    await Future.delayed(confetti.duration + const Duration(seconds: 4)); // wait for confetti to finish
     confetti.stop();
     setState(() => winning = false);
   }
